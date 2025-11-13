@@ -77,9 +77,9 @@ class TestPostgreSQLFeatures:
                     INNER JOIN ciudades cd ON r.ciudad_destino_id = cd.id
                     INNER JOIN ciudades_alcanzables ca ON r.ciudad_origen_id = ca.id
                     WHERE ca.nombre != cd.nombre
-                    LIMIT 10
                 )
-                SELECT COUNT(DISTINCT nombre) FROM ciudades_alcanzables;
+                SELECT COUNT(DISTINCT nombre) FROM ciudades_alcanzables
+                LIMIT 10;
             """)
             reachable_count = cursor.fetchone()[0]
             assert reachable_count > 1, "No se pueden encontrar rutas desde Madrid"
