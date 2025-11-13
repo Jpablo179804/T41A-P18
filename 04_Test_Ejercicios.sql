@@ -83,17 +83,17 @@ DECLARE
     reachable_count INTEGER;
 BEGIN
     WITH RECURSIVE ciudades_alcanzables AS (
-        SELECT c.id, c.nombre
+        SELECT c.id, c.nombre, 0 as depth
         FROM ciudades c WHERE c.nombre = 'Madrid'
         UNION ALL
-        SELECT cd.id, cd.nombre
+        SELECT cd.id, cd.nombre, ca.depth + 1
         FROM rutas r
         INNER JOIN ciudades cd ON r.ciudad_destino_id = cd.id
         INNER JOIN ciudades_alcanzables ca ON r.ciudad_origen_id = ca.id
-        WHERE ca.nombre != cd.nombre
-        LIMIT 10
+        WHERE ca.nombre != cd.nombre AND ca.depth < 3  -- Límite de profundidad de 3 saltos
     )
-    SELECT COUNT(DISTINCT nombre) INTO reachable_count FROM ciudades_alcanzables;
+    SELECT COUNT(DISTINCT nombre) INTO reachable_count 
+    FROM ciudades_alcanzables;
     
     IF reachable_count > 1 THEN
         RAISE NOTICE 'Test 6 pasado: Se pueden alcanzar % ciudades desde Madrid', reachable_count;
