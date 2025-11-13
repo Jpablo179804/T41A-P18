@@ -8,7 +8,8 @@ BEGIN
     END IF;
 END $$;
 
--- Test 2: Verificar inserción de productos
+
+-- Test 2: Verificar inserción de produt
 DO $$
 DECLARE
     product_count INTEGER;
