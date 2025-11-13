@@ -91,10 +91,9 @@ BEGIN
         INNER JOIN ciudades cd ON r.ciudad_destino_id = cd.id
         INNER JOIN ciudades_alcanzables ca ON r.ciudad_origen_id = ca.id
         WHERE ca.nombre != cd.nombre
+        LIMIT 10
     )
-    SELECT COUNT(DISTINCT nombre) INTO reachable_count 
-    FROM ciudades_alcanzables
-    LIMIT 10; -- MOVER LIMIT FUERA DEL CTE
+    SELECT COUNT(DISTINCT nombre) INTO reachable_count FROM ciudades_alcanzables;
     
     IF reachable_count > 1 THEN
         RAISE NOTICE 'Test 6 pasado: Se pueden alcanzar % ciudades desde Madrid', reachable_count;
