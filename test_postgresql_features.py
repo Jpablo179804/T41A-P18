@@ -65,24 +65,24 @@ class TestPostgreSQLFeatures:
             assert cities_count >= 5, f"Solo hay {cities_count} ciudades"
             assert routes_count >= 8, f"Solo hay {routes_count} rutas"
     
-    def test_reachable_cities(self, db_connection):
-        """Test 6: Verificar que se pueden encontrar ciudades alcanzables"""
-        with db_connection.cursor() as cursor:
-            cursor.execute("""
-                WITH RECURSIVE ciudades_alcanzables AS (
-                    SELECT c.id, c.nombre FROM ciudades c WHERE c.nombre = 'Madrid'
-                    UNION ALL
-                    SELECT cd.id, cd.nombre
-                    FROM rutas r
-                    INNER JOIN ciudades cd ON r.ciudad_destino_id = cd.id
-                    INNER JOIN ciudades_alcanzables ca ON r.ciudad_origen_id = ca.id
-                    WHERE ca.nombre != cd.nombre
-                    LIMIT 10
-                )
-                SELECT COUNT(DISTINCT nombre) FROM ciudades_alcanzables;
-            """)
-            reachable_count = cursor.fetchone()[0]
-            assert reachable_count > 1, "No se pueden encontrar rutas desde Madrid"
+   def test_reachable_cities(self, db_connection):
+    """Test 6: Verificar que se pueden encontrar ciudades alcanzables"""
+    with db_connection.cursor() as cursor:
+        cursor.execute("""
+            WITH RECURSIVE ciudades_alcanzables AS (
+                SELECT c.id, c.nombre, 0 as depth
+                FROM ciudades c WHERE c.nombre = 'Madrid'
+                UNION ALL
+                SELECT cd.id, cd.nombre, ca.depth + 1
+                FROM rutas r
+                INNER JOIN ciudades cd ON r.ciudad_destino_id = cd.id
+                INNER JOIN ciudades_alcanzables ca ON r.ciudad_origen_id = ca.id
+                WHERE ca.nombre != cd.nombre AND ca.depth < 3  -- Límite de profundidad de 3 saltos
+            )
+            SELECT COUNT(DISTINCT nombre) FROM ciudades_alcanzables;
+        """)
+        reachable_count = cursor.fetchone()[0]
+        assert reachable_count > 1, "No se pueden encontrar rutas desde Madrid"
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
