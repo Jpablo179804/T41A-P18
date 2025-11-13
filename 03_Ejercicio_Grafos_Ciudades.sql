@@ -59,10 +59,10 @@ WITH RECURSIVE ciudades_alcanzables AS (
     FROM rutas r
     INNER JOIN ciudades cd ON r.ciudad_destino_id = cd.id
     INNER JOIN ciudades_alcanzables ca ON r.ciudad_origen_id = ca.id
-    
+
     WHERE 
-        ca.saltos < 3 AND  -- Límite de saltos para evitar ciclos infinitos
-        cd.id != ALL(ca.camino)  -- Evitar ciclos
+        ca.saltos < 3 AND  
+        cd.id != ALL(ca.camino)  
 )
 SELECT 
     nombre as ciudad,
